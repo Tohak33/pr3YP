@@ -1,11 +1,35 @@
 export default function ReceiptModal({ receipt, onClose }) {
-  if (!receipt) return null;
+  if (!receipt) {
+    return null;
+  }
 
   const productDiscount = receipt.total_initial - receipt.total_with_product_discounts;
 
-  const hideBrokenImage = (e) => {
-    e.currentTarget.style.display = 'none';
-  };
+  function renderProductDiscountLine() {
+    if (productDiscount > 0) {
+      return (
+        <div className="total-line discount-line">
+          <span>Скидки на товары:</span>
+          <span>-{productDiscount} ₽</span>
+        </div>
+      );
+    }
+    return null;
+  }
+
+  function renderPersonalDiscountLine() {
+    if (receipt.personal_discount > 0) {
+      return (
+        <div className="total-line discount-line">
+          <span>
+            Персональная скидка ({receipt.coupon_code} {receipt.personal_discount}%):
+          </span>
+          <span>-{receipt.personal_discount_amount} ₽</span>
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="modal-backdrop">
@@ -25,7 +49,6 @@ export default function ReceiptModal({ receipt, onClose }) {
                 src={item.image_url}
                 alt={item.name}
                 className="receipt-thumb"
-                onError={hideBrokenImage}
               />
               <span className="receipt-item-name">
                 {item.name} × {item.quantity}
@@ -42,21 +65,8 @@ export default function ReceiptModal({ receipt, onClose }) {
             <span>{receipt.total_initial} ₽</span>
           </div>
 
-          {productDiscount > 0 && (
-            <div className="total-line discount-line">
-              <span>Скидки на товары:</span>
-              <span>-{productDiscount} ₽</span>
-            </div>
-          )}
-
-          {receipt.personal_discount > 0 && (
-            <div className="total-line discount-line">
-              <span>
-                Персональная скидка ({receipt.coupon_code} {receipt.personal_discount}%):
-              </span>
-              <span>-{receipt.personal_discount_amount} ₽</span>
-            </div>
-          )}
+          {renderProductDiscountLine()}
+          {renderPersonalDiscountLine()}
 
           <div className="total-line final-line">
             <span>Итог к оплате:</span>

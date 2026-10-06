@@ -1,11 +1,48 @@
 export default function ProductCard({ product, user, onAddToCart }) {
   const discount = product.discount_percent || 0;
   const originalPrice = Number(product.price);
-  const finalPrice = discount > 0 ? Math.round(originalPrice * (1 - discount / 100)) : originalPrice;
 
-  const hideBrokenImage = (e) => {
-    e.currentTarget.style.display = 'none';
-  };
+  function hideBrokenImage(event) {
+    event.currentTarget.style.display = 'none';
+  }
+
+  function calculateFinalPrice() {
+    if (discount > 0) {
+      return Math.round(originalPrice * (1 - discount / 100));
+    }
+    return originalPrice;
+  }
+
+  function renderDiscountTag() {
+    if (discount > 0) {
+      return <span className="discount-tag">-{discount}%</span>;
+    }
+    return null;
+  }
+
+  function renderOldPrice() {
+    if (discount > 0) {
+      return <span className="old-price">{originalPrice} ₽</span>;
+    }
+    return null;
+  }
+
+  function renderCartButton() {
+    if (user?.role === 'admin') {
+      return null;
+    }
+
+    let buttonText = 'Войдите для покупки';
+    if (user) {
+      buttonText = 'В корзину';
+    }
+
+    return (
+      <button className="btn-add-cart" onClick={() => onAddToCart(product)}>
+        {buttonText}
+      </button>
+    );
+  }
 
   return (
     <div className="product-card">
@@ -15,7 +52,7 @@ export default function ProductCard({ product, user, onAddToCart }) {
           <span className="placeholder-code">{product.code}</span>
         </div>
         <img src={product.image_url} alt={product.name} onError={hideBrokenImage} />
-        {discount > 0 && <span className="discount-tag">-{discount}%</span>}
+        {renderDiscountTag()}
       </div>
 
       <div className="product-info">
@@ -25,16 +62,12 @@ export default function ProductCard({ product, user, onAddToCart }) {
         <span className="product-duration">{product.duration}</span>
 
         <div className="price-row">
-          {discount > 0 && <span className="old-price">{originalPrice} ₽</span>}
-          <span className="current-price">{finalPrice} ₽</span>
+          {renderOldPrice()}
+          <span className="current-price">{calculateFinalPrice()} ₽</span>
         </div>
       </div>
 
-      {user?.role !== 'admin' && (
-        <button className="btn-add-cart" onClick={() => onAddToCart(product)}>
-          {user ? 'В корзину' : 'Войдите для покупки'}
-        </button>
-      )}
+      {renderCartButton()}
     </div>
   );
 }
