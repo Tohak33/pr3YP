@@ -2,10 +2,6 @@ export default function ProductCard({ product, user, onAddToCart }) {
   const discount = product.discount_percent || 0;
   const originalPrice = Number(product.price);
 
-  function hideBrokenImage(event) {
-    event.currentTarget.style.display = 'none';
-  }
-
   function calculateFinalPrice() {
     if (discount > 0) {
       return Math.round(originalPrice * (1 - discount / 100));
@@ -47,11 +43,7 @@ export default function ProductCard({ product, user, onAddToCart }) {
   return (
     <div className="product-card">
       <div className="product-image-container">
-        <div className="product-image-placeholder">
-          <span>{product.name}</span>
-          <span className="placeholder-code">{product.code}</span>
-        </div>
-        <img src={product.image_url} alt={product.name} onError={hideBrokenImage} />
+        <img src={product.image_url} alt={product.name} />
         {renderDiscountTag()}
       </div>
 
